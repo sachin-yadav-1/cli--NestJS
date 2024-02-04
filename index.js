@@ -59,21 +59,30 @@ const handleFindDuplicates = async (values) => {
   });
 };
 
-const inputIsValid = (values) => {
-  let is_valid = true;
+const validateInput = (values) => {
+  let res = { is_valid: true, message: '' };
 
-  if (!values.length) return false;
+  if (!values.length) return { is_valid: false, message: 'no values entered!' };
 
   values.forEach((val) => {
     if (val.includes('-')) {
       const [start, end] = val.split('-');
-      if (!+start || !+end) is_valid = false;
+      const invalidValue = !+start || !+end;
+      const invalidRange = +start > +end;
+
+      if (invalidValue || invalidRange) {
+        res.is_valid = false;
+        res.message = `\ninvalid range: ${start + '-' + end}`;
+      }
     } else {
-      if (!+val) is_valid = false;
+      if (!+val) {
+        res.is_valid = false;
+        res.message = `\ninvalid input: ${val}`;
+      }
     }
   });
 
-  return is_valid;
+  return res;
 };
 
 const handleResponseInput = async (resp) => {
@@ -113,8 +122,9 @@ const getUserInput = async (message) => {
       .map((v) => v.trim())
       .filter((v) => v.trim() !== '');
 
-    if (!inputIsValid(values)) {
-      getUserInput('invalid input, please try again!: \n\n');
+    const validityCheckResp = validateInput(values);
+    if (!validityCheckResp.is_valid) {
+      getUserInput(validityCheckResp.message + '\n\n');
       return;
     }
 
