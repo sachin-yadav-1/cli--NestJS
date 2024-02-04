@@ -5,7 +5,19 @@ import { Redis } from 'ioredis';
 export class RedisService {
   constructor(@Inject('REDIS_CLIENT') private readonly redisClient: Redis) {}
 
-  async setKey(key: string, value: any): Promise<void> {
-    await this.redisClient.set(key, JSON.stringify(value));
+  async addValuesToSet(key: any, value: any[]): Promise<any> {
+    return await this.redisClient.sadd(key, ...value);
+  }
+
+  async fetchSetValues(key: string): Promise<any> {
+    return await this.redisClient.smembers(key);
+  }
+
+  async keyExists(key: string): Promise<any> {
+    return await this.redisClient.exists(key);
+  }
+
+  async deleteKey(key: string): Promise<any> {
+    return await this.redisClient.del(key);
   }
 }
