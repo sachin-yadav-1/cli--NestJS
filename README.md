@@ -11,6 +11,9 @@ npm run start:dev
 npm run tz-cli
 ```
 
-### Recommended Setting
+### Recommendation
 
-Since this is test project, I've attached '.env.example' file and reccommend you to rename the file to '.env' to run the project successfully.
+To run the project successfully.
+
+- First start the backend project and then run the CLI.
+- Since this is test project, I've attached '.env.example' file and reccommend you to rename the file to '.env'
