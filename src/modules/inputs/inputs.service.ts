@@ -1,13 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { RedisService } from '../shared/services/redis.service';
+import { FindDuplicatesInputDto } from './dtos/find-duplicates.dto';
+import { ProcessInputDto } from './dtos/process-input.dto';
+import { IFindDuplicatesResult } from './interfaces/find-duplicates.interface';
+import { IProcessNumberResult } from './interfaces/process-inputs.interface';
 
 @Injectable()
 export class InputsService {
   constructor(private readonly redisService: RedisService) {}
 
-  async processUserInputs(data: {
-    numbers: (number | string)[];
-  }): Promise<any> {
+  async processUserInputs(
+    data: ProcessInputDto,
+  ): Promise<IProcessNumberResult> {
     const { numbers } = data;
 
     if (numbers.length) {
@@ -18,10 +22,13 @@ export class InputsService {
     }
 
     const res = await this.redisService.fetchSetValues('inputs');
-    return res.length ? res.map(Number) : [];
+    return { numbers: res.map(Number) };
   }
 
-  async getUserDuplicateInputs(numbers: (number | string)[]): Promise<any> {
+  async getUserDuplicateInputs(
+    data: FindDuplicatesInputDto,
+  ): Promise<IFindDuplicatesResult> {
+    const { numbers } = data;
     if (!numbers.length) {
       return {
         unique: [],
@@ -29,18 +36,15 @@ export class InputsService {
       };
     }
 
-    const final_numbers = this.getFinalNumbersFromUserInput(numbers);
-    const existing_numbers = new Set(
-      (await this.redisService.fetchSetValues('inputs')).map((v: string) =>
-        Number(v),
-      ),
-    );
+    const ig_numbers = this.getFinalNumbersFromUserInput(numbers);
+    const existing_numbers = (
+      await this.redisService.fetchSetValues('inputs')
+    ).map((v: string) => Number(v));
 
-    const unique = [];
-    const duplicates = final_numbers.filter((value) => {
-      if (!existing_numbers.has(+value)) unique.push(value);
-      return existing_numbers.has(+value);
-    });
+    const { duplicates, unique } = this.getDuplicatesAndUniqueValues(
+      ig_numbers,
+      existing_numbers,
+    );
 
     return {
       unique,
@@ -48,6 +52,11 @@ export class InputsService {
     };
   }
 
+  /**
+   * user input might have single numbers or a range of numbers,
+   * this function will return an array with the incoming individual values and,
+   * the values between the provided ranges
+   */
   getFinalNumbersFromUserInput(numbers: (number | string)[]): number[] {
     return numbers.reduce((acc, num): number[] => {
       if (typeof num === 'string' && num.includes('-')) {
@@ -65,5 +74,33 @@ export class InputsService {
 
       return acc;
     }, []);
+  }
+
+  /**
+   * this function will do the following:
+   * 1. collect unique values of incoming array in "ig_arr_unique"
+   * 2. find duplicates values that exists in DB
+   */
+  getDuplicatesAndUniqueValues(
+    ig_arr: number[],
+    existing_arr: number[],
+  ): { unique: number[]; duplicates: number[] } {
+    const ig_arr_unique = {};
+    const ig_arr_duplicates = [];
+
+    const existing_arr_unique = new Set(existing_arr);
+
+    ig_arr.forEach((val) => {
+      if (existing_arr_unique.has(val)) {
+        ig_arr_duplicates.push(val);
+      } else if (!ig_arr_unique[val]) {
+        ig_arr_unique[val] = true;
+      }
+    });
+
+    return {
+      unique: Object.keys(ig_arr_unique).map(Number),
+      duplicates: Array.from(new Set(ig_arr_duplicates)),
+    };
   }
 }
