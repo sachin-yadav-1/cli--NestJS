@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import redisConfig from './config/redis.config';
+import { CorsMiddleware } from './middlewares/cors.middleware';
 import { InputsModule } from './modules/inputs/inputs.module';
 import { SharedModule } from './modules/shared/shared.module';
 
@@ -17,4 +18,8 @@ import { SharedModule } from './modules/shared/shared.module';
   ],
   controllers: [],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CorsMiddleware).forRoutes('*');
+  }
+}
