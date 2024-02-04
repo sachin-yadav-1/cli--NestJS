@@ -8,7 +8,7 @@ const rl = readline.createInterface({
 process.stdin.setRawMode(true);
 
 const exit = () => {
-  console.log('Exiting tz-assess CLI.');
+  console.log('Exiting TranslateZ CLI.');
   rl.close();
 };
 
