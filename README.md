@@ -20,5 +20,4 @@ To run the project successfully.
 
 ### Video
 
-[![Video](https://drive.google.com/file/d/1-1CnODmlNS1IBaP2xIzRMz5NbOljglOP)](https://drive.google.com/file/d/1-1CnODmlNS1IBaP2xIzRMz5NbOljglOP/preview)
-
+[![Video](https://drive.google.com/uc?export=view&id=1-1CnODmlNS1IBaP2xIzRMz5NbOljglOP)](https://drive.google.com/file/d/1-1CnODmlNS1IBaP2xIzRMz5NbOljglOP/preview)
