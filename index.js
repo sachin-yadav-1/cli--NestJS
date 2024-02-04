@@ -36,7 +36,7 @@ const makeRequest = async (url, method, body) => {
 
 const handleAddNumbersToDB = async (values) => {
   const resp = await makeRequest(
-    'http://localhost:4000/numbers/process',
+    'http://localhost:8080/numbers/process',
     'POST',
     { numbers: values },
   );
@@ -54,7 +54,7 @@ const handleAddNumbersToDB = async (values) => {
 };
 
 const handleFindDuplicates = async (values) => {
-  return await makeRequest('http://localhost:4000/numbers/duplicates', 'POST', {
+  return await makeRequest('http://localhost:8080/numbers/duplicates', 'POST', {
     numbers: values,
   });
 };

@@ -8,7 +8,7 @@ import { SharedModule } from './modules/shared/shared.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.env.dev',
+      envFilePath: '.env',
       isGlobal: true,
       cache: true,
       load: [redisConfig],
