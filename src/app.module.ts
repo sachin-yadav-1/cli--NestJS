@@ -1,10 +1,20 @@
 import { Module } from '@nestjs/common';
-import { SharedModuleTsModule } from './shared/shared.module';
-import { RedisServiceTsService } from './shared/redis.service';
+import { ConfigModule } from '@nestjs/config';
+import redisConfig from './config/redis.config';
+import { InputsModule } from './modules/inputs/inputs.module';
+import { SharedModule } from './modules/shared/shared.module';
 
 @Module({
-  imports: [SharedModuleTsModule],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: '.env.dev',
+      isGlobal: true,
+      cache: true,
+      load: [redisConfig],
+    }),
+    SharedModule,
+    InputsModule,
+  ],
   controllers: [],
-  providers: [RedisServiceTsService],
 })
 export class AppModule {}
